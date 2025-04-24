@@ -19,7 +19,7 @@ def resolver_estrutura(Ha, Hd, Pbc):
 
     # Equilíbrio de Momentos
     Mc = 0
-    Vb = (Vbc * 3 / 2 - Hd * 1 - Mc) / 3
+    Vb = round((Vbc * 3 / 2 - Hd * 1 - Mc) / 3,2)
     Vc = Vb_Vc - Vb
 
     # Outros cálculos
@@ -31,7 +31,7 @@ def resolver_estrutura(Ha, Hd, Pbc):
     V = Fv_barra + Vb * (1 - x)  # diagrama de forças cortantes (simplificado)
     M = -sp.integrate(V, x)  # diagrama de momentos
 
-    return Hc, Vb, Vc, N, sp.simplify(V), sp.simplify(M)
+    return round(Hc, 2), round(Vb, 2), round(Vc, 2), round(N, 2), sp.simplify(V), sp.simplify(M)
 
 
 def plot_estrutura_e_equacoes(Ha, Hd, Pbc):
@@ -43,14 +43,14 @@ def plot_estrutura_e_equacoes(Ha, Hd, Pbc):
         f"Equações fundamentais do equilíbrio\n\n"
         "I. Equilíbrio Horizontal\n"
         "Fh = 0\n"
-        f"Hc = - Ha - Hd = {-Ha - Hd} kN\n\n"
+        f"Hc = - Ha - Hd = {round(-Ha - Hd, 2)} kN\n\n"
         "II. Equilíbrio Vertical\n"
         "Fv = 0\n"
-        f"Vb + Vc = - Vbc = {-Pbc*3} kN\n\n"
+        f"Vb + Vc = - Vbc = {round(-Pbc*3, 2)} kN\n\n"
         "III. Equilíbrio de Momentos\n"
         "Mc = 0\n"
-        f"Vb = (Vbc * 3/2 - Hd * 1 - Mc) / 3 = ({Vb} kN)\n"
-        f"N = Fh_barra + Ha = ({Ha} kN)\n"
+        f"Vb = (Vbc * 3/2 - Hd * 1 - Mc) / 3 = ({round(Vb, 2)} kN)\n"
+        f"N = Fh_barra + Ha = ({round(Ha, 2)} kN)\n"
         f"V(x) = {sp.pretty(V)}  kN\n"
         f"M(x) = {sp.pretty(M)}  kN·m\n\n"
         "\n*Grau de estatisticidade da estrutura: Isostático"
@@ -75,7 +75,7 @@ def plot_estrutura_e_equacoes(Ha, Hd, Pbc):
     # Marcação dos nós com legenda:
     for point, label, dx, dy in zip(
         [A, B, C, D],
-        ["A", "B\n(Apoio Simples)", "C\n(Apoio Articulado)", "D"],
+        ["A", "B\n(Apoio Simples)", "     C\n       (Apoio\n           Articulado)", "D"],
         [-0.1, -0.05, 0.15, 0.1],
         [-0.2, 0.1, 0.1, 0.1],
     ):
@@ -112,7 +112,7 @@ def plot_estrutura_e_equacoes(Ha, Hd, Pbc):
         xytext=(A[0], A[1]),
         arrowprops=dict(facecolor="red", arrowstyle="->", lw=2),
     )
-    ax1.text(A[0] - 0.6, A[1] + 0.1, f"{Ha} kN", color="red")
+    ax1.text(A[0] - 0.6, A[1] + 0.1, f"{round(Ha, 2)} kN", color="red")
 
     # Força horizontal Hd em D
     ax1.annotate(
@@ -121,7 +121,7 @@ def plot_estrutura_e_equacoes(Ha, Hd, Pbc):
         xytext=(D[0], D[1]),
         arrowprops=dict(facecolor="red", arrowstyle="->", lw=2),
     )
-    ax1.text(D[0] + 0.3, D[1] + 0.1, f"{-Hd} kN", color="red")
+    ax1.text(D[0] + 0.3, D[1] + 0.1, f"{round(-Hd, 2)} kN", color="red")
 
     # Carregamento distribuído entre B e C
     for i in range(4):
@@ -132,7 +132,7 @@ def plot_estrutura_e_equacoes(Ha, Hd, Pbc):
             xytext=(x, 0.5),  # Start point remains at y=0.5
             arrowprops=dict(facecolor="blue", arrowstyle="->", lw=1),
         )
-    ax1.text(1.5, 0.4, f"{-Pbc} kN/m\ndistribuído", ha="center", color="blue")
+    ax1.text(1.5, 0.4, f"{round(-Pbc,2)} kN/m\ndistribuído", ha="center", color="blue")
 
     ax1.set_xlim(-2, 4)
     ax1.set_ylim(-1.5, 2)
@@ -162,8 +162,7 @@ Pbc = st.sidebar.number_input(
     step=0.1,
 )
 
-if st.sidebar.button("Gerar Análise"):
-    # Gerar o gráfico com a estrutura e as equações
+with st.spinner('Carregando...'):
     fig = plot_estrutura_e_equacoes(Ha, Hd, Pbc)
 
     st.pyplot(fig)
